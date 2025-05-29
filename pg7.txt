@@ -1,54 +1,71 @@
+// Part - 1: Insert Details
+// don't forget to add MySQL JDBC Driver library
+
 import java.sql.*;
-public class InsertDemo {
-// JDBC driver name and database URL
-static final String JDBC_DRIVER = "com.mysql.jdbc.Driver"; static final String DB_URL =
-"jdbc:mysql://localhost:3306/";
-// Database credentials
-static final String USER = "root";
-static final String PASS = "1234";
-static final String dbName = "jdbctest";
-public static void main(String[] args) { Connection conn = null;
-Statement stmt = null; try{
-//STEP 2: Register JDBC driver
-Class.forName("com.mysql.jdbc.Driver");
-//STEP 3: Open a connection System.out.println("Connecting to a selected database...");
-conn = DriverManager.getConnection(DB_URL+dbName,USER,PASS); System.out.println("Connected
-database successfully...");
-//STEP 4: Execute a query System.out.println("Inserting records into the table..."); stmt =
-conn.createStatement();
-String sql = "INSERT INTO employees " +
-"VALUES ('5001', '30', 'Surendra', 'K','Coimbatore')"; stmt.executeUpdate(sql);
-sql = "INSERT INTO employees " +
-"VALUES ('5002', '21', 'Athul', 'K','Wayanad')";
-stmt.executeUpdate(sql);
-sql = "INSERT INTO employees " +
-"VALUES ('5003', '20', 'Yadhu', 'K T','Palakkad')";
-stmt.executeUpdate(sql);
-sql = "INSERT INTO employees " +
-"VALUES ('5004', '23', 'Pravin', 'K P','Thrissur')";
-stmt.executeUpdate(sql);
-sql = "UPDATE employees " +
-"SET age = 21 WHERE id in (5003, 5004)";
-stmt.executeUpdate(sql);
-System.out.println("Inserted records into the table...");
-String sql2="DELETE FROM employees where id=5004"; stmt.executeUpdate(sql2);
-System.out.println("deleted records in the table where id is 5004...");
-ResultSet rs= stmt.executeQuery("select * from employees"); while(rs.next()){
-System.out.println(rs.getString(1)+ " "+rs.getString(2)+ " "+rs.getString(3)+ " "+rs.getString(4)+ "
-"+rs.getString(5)+" ");
+import java.util.*;
+
+public class InsertDetails {
+    public static void main(String[] args) {
+        String usn, name, dept;
+        Scanner obj = new Scanner(System.in);
+
+        System.out.println("Enter Student Name:");
+        name = obj.nextLine();
+
+        System.out.println("Enter Student USN:");
+        usn = obj.nextLine();
+
+        System.out.println("Enter Student Dept:");
+        dept = obj.nextLine();
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver"); // For newer versions use: com.mysql.cj.jdbc.Driver
+            Connection con = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/Student", "root", "root"
+            );
+
+            Statement stmt = con.createStatement();
+            String q1 = "INSERT INTO student VALUES('" + usn + "', '" + name + "', '" + dept + "')";
+            int x = stmt.executeUpdate(q1);
+
+            if (x > 0)
+                System.out.println("Successfully Inserted");
+            else
+                System.out.println("Insert Failed");
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
 }
-}catch(SQLException se){
-//Handle errors for JDBC se.printStackTrace();
-}catch(Exception e){
-//Handle errors for Class.forName e.printStackTrace();
-}finally{
-//finally block used to close resources try{
-if(stmt!=null) conn.close();
-}catch(SQLException se){
-}// do nothing try{
-if(conn!=null) conn.close();
-}catch(SQLException se){ se.printStackTrace();
-}//end finally try
-}//end try System.out.println("Goodbye!");
-}//end main
+
+
+Part-2 Retrieve Details
+
+import java.sql.*;
+
+public class RetrieveDetails {
+    public static void main(String[] args) {
+        String url = "jdbc:mysql://localhost:3306/Student";
+        String user = "root";
+        String password = "root";
+
+       
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");  // Updated driver class
+
+            try (Connection con = DriverManager.getConnection(url, user, password);
+                 Statement stmt = con.createStatement();
+                 ResultSet rs = stmt.executeQuery("SELECT * FROM student")) {
+
+                while (rs.next()) {
+                    // Assuming columns: ID, FirstName, LastName for example
+                    System.out.println(rs.getString(1) + " " + rs.getString(2) + " " + rs.getString(3));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  // Print full stack trace for debugging
+        }
+    }
 }

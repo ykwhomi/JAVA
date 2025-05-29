@@ -1,43 +1,50 @@
 //Part-1 ServerSide.java
+
 import java.io.*;
 import java.net.*;
-public class ServerSide
-{
-public static void main(String[]args)
-{
-try
-{
-ServerSocket ss=new ServerSocket(3306);
-Socket s=ss.accept();//establishes connection
-DataInputStream dis=new DataInputStream(s.getInputStream());
-String str=(String)dis.readUTF();
-System.out.println("message= "+str);
-ss.close();
+
+public class ServerSide {
+    public static void main(String[] args) {
+        try {
+            ServerSocket ss = new ServerSocket(3308);
+            System.out.println("Server is running and waiting for a client...");
+
+            Socket s = ss.accept(); // Establishes connection
+            System.out.println("Client connected.");
+
+            DataInputStream dis = new DataInputStream(s.getInputStream());
+            String str = dis.readUTF(); // Read message from client
+            System.out.println("Message = " + str);
+
+            dis.close();
+            s.close();
+            ss.close();
+        } catch (Exception e) {
+            System.out.println("Error: " + e);
+        }
+    }
 }
-catch(Exception e)
-{
-System.out.println(e);
-}
-}
-//Part-2 ClientSide.java
+
+
+// Part-2 ClientSide.java
+// Source packages -> new -> java class -> name it as ClientSide
+
 import java.io.*;
 import java.net.*;
-public class ClientSide
-{
-public static void main(String[] args)
-{
-try
-{
-Socket s=new Socket("localhost",3306);
-DataOutputStreamdout=new
-DataOutputStream(s.getOutputStream());
-dout.writeUTF("Hello Server");
-dout.flush();
-dout.close();
-s.close();
-}
-catch(Exception e)
-{
-System.out.println(e);}
-}
+
+public class ClientSide {
+    public static void main(String[] args) {
+        try {
+            Socket s = new Socket("localhost", 3308);
+            DataOutputStream dout = new DataOutputStream(s.getOutputStream());
+
+            dout.writeUTF("Hello Server");
+            dout.flush();
+
+            dout.close();
+            s.close();
+        } catch (Exception e) {
+            System.out.println("Error: " + e);
+        }
+    }
 }
