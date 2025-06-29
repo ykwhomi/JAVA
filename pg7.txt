@@ -1,71 +1,44 @@
-// Part - 1: Insert Details
-// don't forget to add MySQL JDBC Driver library
-
 import java.sql.*;
-import java.util.*;
-
-public class InsertDetails {
+public class InsertDemo {
     public static void main(String[] args) {
-        String usn, name, dept;
-        Scanner obj = new Scanner(System.in);
-
-        System.out.println("Enter Student Name:");
-        name = obj.nextLine();
-
-        System.out.println("Enter Student USN:");
-        usn = obj.nextLine();
-
-        System.out.println("Enter Student Dept:");
-        dept = obj.nextLine();
-
-        try {
-            Class.forName("com.mysql.jdbc.Driver"); // For newer versions use: com.mysql.cj.jdbc.Driver
-            Connection con = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/Student", "root", "root"
-            );
-
-            Statement stmt = con.createStatement();
-            String q1 = "INSERT INTO student VALUES('" + usn + "', '" + name + "', '" + dept + "')";
-            int x = stmt.executeUpdate(q1);
-
-            if (x > 0)
-                System.out.println("Successfully Inserted");
-            else
-                System.out.println("Insert Failed");
-
-            con.close();
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }
-}
-
-
-Part-2 Retrieve Details
-
-import java.sql.*;
-
-public class RetrieveDetails {
-    public static void main(String[] args) {
-        String url = "jdbc:mysql://localhost:3306/Student";
+        // JDBC URL, username and password of MySQL server
+        String url = "jdbc:mysql://localhost:3306/jdbctest"; // Ensure 'jdbctest' DB exists
         String user = "root";
-        String password = "root";
+        String password = "1234";
 
-       
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");  // Updated driver class
+        try (
+            Connection conn = DriverManager.getConnection(url, user, password);
+            Statement stmt = conn.createStatement()
+        ) {
+            System.out.println("Connected to the database...");
 
-            try (Connection con = DriverManager.getConnection(url, user, password);
-                 Statement stmt = con.createStatement();
-                 ResultSet rs = stmt.executeQuery("SELECT * FROM student")) {
+            // Insert records
+            stmt.executeUpdate("INSERT INTO employees VALUES ('5001', '30', 'Surendra', 'K','Coimbatore')");
+            stmt.executeUpdate("INSERT INTO employees VALUES ('5002', '21', 'Athul', 'K','Wayanad')");
+            stmt.executeUpdate("INSERT INTO employees VALUES ('5003', '20', 'Yadhu', 'K T','Palakkad')");
+            stmt.executeUpdate("INSERT INTO employees VALUES ('5004', '23', 'Pravin', 'K P','Thrissur')");
 
-                while (rs.next()) {
-                    // Assuming columns: ID, FirstName, LastName for example
-                    System.out.println(rs.getString(1) + " " + rs.getString(2) + " " + rs.getString(3));
-                }
+            // Update records
+            stmt.executeUpdate("UPDATE employees SET age = 21 WHERE id IN (5003, 5004)");
+
+            // Delete a record
+            stmt.executeUpdate("DELETE FROM employees WHERE id = 5004");
+
+            // Display all records
+            ResultSet rs = stmt.executeQuery("SELECT * FROM employees");
+            while (rs.next()) {
+                System.out.println(
+                    rs.getString(1) + " " +
+                    rs.getString(2) + " " +
+                    rs.getString(3) + " " +
+                    rs.getString(4) + " " +
+                    rs.getString(5));
             }
-        } catch (Exception e) {
-            e.printStackTrace();  // Print full stack trace for debugging
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
+        System.out.println("Goodbye!");
     }
 }
