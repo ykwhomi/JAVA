@@ -1,41 +1,68 @@
-import java.io.*;
-import java.sql.Date;
-import java.util.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
-public class PageHitCounter extends HttpServlet {
-private int hitCount;
-public void init() {
-hitCount = 0; }
-public void doGet(HttpServletRequest request, HttpServletResponse response)
-throws ServletException, IOException {
-// Set response content type
-response.setContentType("text/html");
-hitCount++;
-PrintWriter out = response.getWriter();
-String title = "Total Number of Hits";
-String docType = "<!doctype html public \"
--//w3c//dtd html 4.0 " +
-"transitional//en\">\n";
-out.println(docType +
-"<html>\n" +
-"<head><title>" + title + "</title></head>\n" +
-"<body bgcolor = \"#f0f0f0\">\n" +
-"<h1 align = \"center\">" + title + "</h1>\n" +
-"<h2 align = \"center\">" + hitCount + "</h2>\n" +
-"</body>
-</html>"
-);}
-public void destroy() {
-    // This is optional step but if you like you
-// can write hitCount value in your database.
-}}
-Xml file
-<servlet>
-<servlet-name>PageHitCounter</servlet-name>
-<servlet-class>PageHitCounter</servlet-class>
-</servlet>
-<servlet-mapping>
-<servlet-name>PageHitCounter</servlet-name>
-<url-pattern>/PageHitCounter</url-pattern>
-</servlet-mapping>
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.sql.*;
+
+public class P9_DatabaseAccess extends HttpServlet {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+
+        String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";  // Updated driver class
+        String DB_URL = "jdbc:mysql://localhost:3306/STUDENT"; // Ensure port and DB name are correct
+        String USER = "root";
+        String PASS = "root";
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        String title = "Database Result";
+        String docType = "<!DOCTYPE html>";
+
+        out.println(docType +
+            "<html>\n" +
+            "<head><title>" + title + "</title></head>\n" +
+            "<body bgcolor='#f0f0f0'>\n" +
+            "<h1 align='center'>" + title + "</h1>\n");
+
+        Connection conn = null;
+        Statement stmt = null;
+
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            stmt = conn.createStatement();
+            String sql = "SELECT * FROM stu";
+            ResultSet rs = stmt.executeQuery(sql);
+
+            out.println("<table border='1' align='center'>");
+            out.println("<tr><th>ID</th><th>Name</th><th>Age</th></tr>");
+
+            while (rs.next()) {
+                int id = rs.getInt(1);
+                String name = rs.getString(2);
+                int age = rs.getInt(3);
+
+                out.println("<tr><td>" + id + "</td><td>" + name + "</td><td>" + age + "</td></tr>");
+            }
+            out.println("</table>");
+            out.println("</body></html>");
+
+            rs.close();
+            stmt.close();
+            conn.close();
+
+        } catch (SQLException se) {
+            out.println("<p>Error: " + se.getMessage() + "</p>");
+            se.printStackTrace();
+        } catch (Exception e) {
+            out.println("<p>Error: " + e.getMessage() + "</p>");
+            e.printStackTrace();
+        } finally {
+            try { if (stmt != null) stmt.close(); } catch (SQLException ignored) {}
+            try { if (conn != null) conn.close(); } catch (SQLException ignored) {}
+        }
+    }
+}
